@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chatbot Lead Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+/* THEME VARIABLES */
+:root{
+  --primary:#2563eb;
+  --primary-dark:#1e40af;
+
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --sub:#6b7280;
+  --border:#e5e7eb;
+}
+
+/* DARK MODE */
+.dark{
+  --bg:#0f172a;
+  --card:#111827;
+  --text:#e5e7eb;
+  --sub:#9ca3af;
+  --border:#1f2937;
+}
+
+body{
+  margin:0;
+  font-family:"Segoe UI", system-ui, -apple-system, Arial;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* HEADER */
+.topbar{
+  height:60px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 25px;
+}
+.logo{
+  font-size:20px;
+  font-weight:700;
+  color:var(--primary);
+}
+.badge{
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:13px;
+  background:#e0ecff;
+  color:#1e3a8a;
+}
+
+/* Dark Mode Toggle */
+.theme-toggle{
+  padding:7px 14px;
+  background:var(--border);
+  border-radius:10px;
+  cursor:pointer;
+  margin-right:10px;
+}
+
+/* LAYOUT */
+.wrapper{
+  display:flex;
+  min-height:calc(100vh - 60px);
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:250px;
+  background:var(--card);
+  border-right:1px solid var(--border);
+  padding:20px;
+}
+.sidebar h3{
+  font-size:16px;
+  margin-bottom:15px;
+}
+.navitem{
+  padding:10px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  color:var(--text);
+  margin-bottom:8px;
+  transition:.2s;
+  font-size:15px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.navitem:hover{
+  background:#eef2ff;
+  color:var(--primary-dark);
+}
+.dark .navitem:hover{
+  background:#1f2937;
+}
+.navitem.active{
+  background:var(--primary);
+  color:white;
+}
+
+/* CONTENT */
+.content{
+  flex:1;
+  padding:25px;
+}
+
+/* CARDS */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:15px;
+  margin-bottom:25px;
+}
+.card{
+  background:var(--card);
+  padding:18px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  box-shadow:0 10px 25px rgba(0,0,0,.03);
+}
+.card span{
+  color:var(--sub);
+  font-size:14px;
+}
+
+/* TABLE */
+.table-box{
+  background:var(--card);
+  padding:20px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  box-shadow:0 10px 25px rgba(0,0,0,.03);
+  margin-top:15px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+th{
+  text-align:left;
+  background:#fafafa;
+}
+.dark th{
+  background:#111827;
+}
+
+/* SETTINGS */
+.input-box{
+  padding:12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  width:100%;
+  background:var(--bg);
+  color:var(--text);
+}
+.button{
+  background:var(--primary);
+  color:white;
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+.button:hover{
+  background:var(--primary-dark);
+}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:15px;
+  color:var(--sub);
+  font-size:13px;
+}
+
+.hidden{display:none;}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="topbar">
+  <div class="logo">Chatbot Lead Dashboard</div>
+
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙 Dark Mode</div>
+    <div class="badge" id="connectionBadge">Connected</div>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Navigation</h3>
+
+    <div class="navitem active" onclick="showPage('dashboard', this)">📊 Dashboard</div>
+    <div class="navitem" onclick="showPage('logs', this)">💬 Chat Logs</div>
+    <div class="navitem" onclick="showPage('leads', this)">👥 Leads</div>
+    <div class="navitem" onclick="showPage('settings', this)">⚙ Settings</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="dashboardPage">
+      <h1>Welcome 👋</h1>
+      <p style="color:var(--sub)">Your chatbot analytics dashboard</p>
+
+      <div class="cards">
+        <div class="card">
+          <span>Total Leads</span>
+          <h2 id="leadCount">0</h2>
+        </div>
+        <div class="card">
+          <span>Chat Sessions</span>
+          <h2 id="chatCount">0</h2>
+        </div>
+        <div class="card">
+          <span>Latest Lead</span>
+          <h2 id="lastLead">N/A</h2>
+        </div>
+      </div>
+
+      <div class="table-box">
+        <h2>Recent Leads</h2>
+        <table>
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Message</th>
+            <th>Time</th>
+          </tr>
+          </thead>
+          <tbody id="leadTable">
+          <tr><td colspan="4" style="text-align:center;">No data yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div id="logsPage" class="hidden">
+      <h1>💬 Chat Logs</h1>
+      <p style="color:var(--sub)">All chatbot conversations will appear here.</p>
+
+      <div class="table-box">
+        <table>
+          <thead>
+          <tr>
+            <th>Session</th>
+            <th>User</th>
+            <th>Bot</th>
+            <th>Time</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr><td colspan="4" style="text-align:center;">No logs yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div id="leadsPage" class="hidden">
+      <h1>👥 Leads</h1>
+      <p style="color:var(--sub)">All captured leads will appear here.</p>
+
+      <div class="table-box">
+        <table>
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Source</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr><td colspan="4" style="text-align:center;">No leads yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="settingsPage" class="hidden">
+      <h1>⚙ Settings</h1>
+      <p style="color:var(--sub)">Dashboard preferences</p>
+
+      <div class="table-box">
+        <h3>Admin Display Name</h3>
+        <input class="input-box" id="adminNameInput" placeholder="Enter name">
+        <br><br>
+        <button class="button" onclick="saveSettings()">Save</button>
+        <p id="saveStatus" style="color:green;"></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  Built for you — your private AI dashboard 🚀
+</div>
+
+<script>
+
+/* ---------- NAVIGATION ---------- */
+function showPage(page, el){
+  ["dashboard","logs","leads","settings"].forEach(p=>{
+    document.getElementById(p+"Page").classList.add("hidden");
+  });
+  document.getElementById(page+"Page").classList.remove("hidden");
+
+  document.querySelectorAll(".navitem").forEach(n => n.classList.remove("active"));
+  el.classList.add("active");
+}
+
+/* ---------- SETTINGS SAVE ---------- */
+function saveSettings(){
+  let name=document.getElementById("adminNameInput").value;
+  if(!name.trim()) return;
+  localStorage.setItem("adminName",name);
+  document.getElementById("saveStatus").innerText="Saved successfully!";
+}
+document.getElementById("adminNameInput").value=localStorage.getItem("adminName")||"";
+
+/* ---------- THEME ---------- */
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+
+  let mode = document.body.classList.contains("dark") ? "dark" : "light";
+  localStorage.setItem("themeMode",mode);
+
+  document.getElementById("themeToggle").innerText =
+    mode==="dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
+}
+
+/* Maintain saved theme */
+if(localStorage.getItem("themeMode")==="dark"){
+  document.body.classList.add("dark");
+  document.getElementById("themeToggle").innerText="☀️ Light Mode";
+}
+
+console.log("Dashboard Ready");
+
+</script>
+
+</body>
+</html>
