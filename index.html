@@ -201,7 +201,7 @@ th{
 
   <div style="display:flex;align-items:center;gap:10px;">
     <div class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙 Dark Mode</div>
-    <div class="badge" id="connectionBadge">Connected</div>
+    <div class="badge" id="connectionBadge">Connecting...</div>
   </div>
 </div>
 
@@ -252,7 +252,7 @@ th{
           </tr>
           </thead>
           <tbody id="leadTable">
-          <tr><td colspan="4" style="text-align:center;">No data yet.</td></tr>
+          <tr><td colspan="4" style="text-align:center;">Loading...</td></tr>
           </tbody>
         </table>
       </div>
@@ -261,7 +261,7 @@ th{
     <!-- LOGS -->
     <div id="logsPage" class="hidden">
       <h1>💬 Chat Logs</h1>
-      <p style="color:var(--sub)">All chatbot conversations will appear here.</p>
+      <p style="color:var(--sub)">Chat logs coming next.</p>
 
       <div class="table-box">
         <table>
@@ -283,7 +283,7 @@ th{
     <!-- LEADS -->
     <div id="leadsPage" class="hidden">
       <h1>👥 Leads</h1>
-      <p style="color:var(--sub)">All captured leads will appear here.</p>
+      <p style="color:var(--sub)">All captured leads</p>
 
       <div class="table-box">
         <table>
@@ -295,8 +295,8 @@ th{
             <th>Source</th>
           </tr>
           </thead>
-          <tbody>
-          <tr><td colspan="4" style="text-align:center;">No leads yet.</td></tr>
+          <tbody id="fullLeadsTable">
+          <tr><td colspan="4" style="text-align:center;">Loading...</td></tr>
           </tbody>
         </table>
       </div>
@@ -356,13 +356,74 @@ function toggleTheme(){
     mode==="dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
 }
 
-/* Maintain saved theme */
 if(localStorage.getItem("themeMode")==="dark"){
   document.body.classList.add("dark");
   document.getElementById("themeToggle").innerText="☀️ Light Mode";
 }
 
-console.log("Dashboard Ready");
+
+// ===============================
+// 🚀 LOAD LIVE DATA
+// ===============================
+async function loadDashboard(){
+  try{
+    let res = await fetch(
+      "https://chatbotleadslog.netlify.app/.netlify/functions/getData"
+    );
+
+    const data = await res.json();
+    const leads = data.leads || [];
+
+    document.getElementById("connectionBadge").innerText = "Connected";
+
+    document.getElementById("leadCount").innerText = leads.length;
+    document.getElementById("chatCount").innerText = 0;
+
+    document.getElementById("lastLead").innerText =
+      leads.length ? leads[leads.length-1].name : "N/A";
+
+
+    // DASHBOARD RECENT TABLE
+    let t = document.getElementById("leadTable");
+    t.innerHTML = "";
+
+    if(!leads.length){
+      t.innerHTML = `<tr><td colspan="4" style="text-align:center;">No leads yet.</td></tr>`;
+    } else {
+      [...leads].reverse().slice(0,5).forEach(l=>{
+        t.innerHTML += `
+        <tr>
+          <td>${l.name}</td>
+          <td>${l.email}</td>
+          <td>${l.last_query || "—"}</td>
+          <td>${l.time}</td>
+        </tr>`;
+      });
+    }
+
+    // FULL LEADS PAGE TABLE
+    let full = document.getElementById("fullLeadsTable");
+    full.innerHTML = "";
+
+    leads.reverse().forEach(l=>{
+      full.innerHTML += `
+      <tr>
+        <td>${l.name}</td>
+        <td>${l.email}</td>
+        <td>${l.phone || "—"}</td>
+        <td>${l.page_url || "Unknown"}</td>
+      </tr>`;
+    });
+
+  } catch(e){
+    document.getElementById("connectionBadge").innerText="Disconnected";
+    document.getElementById("connectionBadge").style.background="#ffe4e4";
+  }
+}
+
+loadDashboard();
+
+console.log("Dashboard Ready 🚀");
 
 </script>
 
